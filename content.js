@@ -1,46 +1,62 @@
 
-const removeSuggestedPosts = () => {
-  const feedItems = document.querySelectorAll("[role=listitem]")
-  feedItems.forEach(fi => {
-    if (fi.outerHTML.includes(">Suggested</p>")) {
-      fi.remove()
-    }
-  })
-}
+const removeFeedDistractions = (settings) => {
+  // feedDistractions = {
+  // Promoted: [],
+  // RecommenedPeopleForYou: [],
+  // RecommenedJobsForYou: [],
+  // Suggested: []
+  // }
 
-const removePromotedPosts = () => {
-  const feedItems = document.querySelectorAll("[role=listitem]")
-  feedItems.forEach(fi => {
-    if (fi.outerHTML.includes(">Promoted</p>") || fi.outerHTML.includes(">Promoted by<span")) {
-      fi.remove()
+  const feed = document.querySelector('[data-testid="mainFeed"]')
+  if (feed) {
+    if (settings.master && settings.nukeFeed) {
+      feed.style.contentVisibility = 'hidden'
+      return
+    } else {
+      feed.style.contentVisibility = 'visible'
     }
-  })
-}
+  }
 
-const removeRecommendedAccountsPosts = () => {
   const feedItems = document.querySelectorAll("[role=listitem]")
+
   feedItems.forEach(fi => {
-    if (fi.outerHTML.includes(">Recommended for you</p>")) {
-      fi.remove()
+    const component = fi.outerHTML
+    if (component.includes(">Jobs recommended for you</p>") && fi.parentElement.parentElement) {
+      if (settings.master && settings.jobSuggestions) {
+        fi.parentElement.parentElement.style.contentVisibility = 'hidden'
+      } else {
+        fi.parentElement.parentElement.style.contentVisibility = 'visible'
+      }
     }
-  })
-}
 
-const removeRecommendedJobsPosts = () => {
-  const feedItems = document.querySelectorAll("[role=listitem]")
-  feedItems.forEach(fi => {
-    if (fi.outerHTML.includes(">Jobs recommended for you</p>")) {
-      fi.remove()
+    if (component.includes(">Recommended for you</p>") && fi.parentElement.parentElement) {
+      if (settings.master && settings.followSuggestions) {
+        fi.parentElement.parentElement.style.contentVisibility = 'hidden'
+      } else {
+        fi.parentElement.parentElement.style.contentVisibility = 'visible'
+      }
+    }
+
+    if ((component.includes(">Promoted</p>") || component.includes(">Promoted by<span")) && fi.parentElement.parentElement) {
+      if (settings.master && settings.promoted) {
+        fi.parentElement.parentElement.style.contentVisibility = 'hidden'
+      } else {
+        fi.parentElement.parentElement.style.contentVisibility = 'visible'
+      }
+    }
+
+    if (component.includes(">Suggested</p>") && fi.parentElement.parentElement) {
+      if (settings.master && settings.suggested) {
+        fi.parentElement.parentElement.style.contentVisibility = 'hidden'
+      } else {
+        fi.parentElement.parentElement.style.contentVisibility = 'visible'
+      }
     }
   })
 }
 
 const cleanUp = (settings) => {
-  if (!settings.master) return
-  if (settings.suggested) removeSuggestedPosts()
-  if (settings.promoted) removePromotedPosts()
-  if (settings.followSuggestions) removeRecommendedAccountsPosts()
-  if (settings.jobSuggestions) removeRecommendedJobsPosts()
+  removeFeedDistractions(settings)
 }
 
 let observer = null
@@ -69,10 +85,10 @@ const observeAndRemove = (settings) => {
 // Start on page load
 chrome.storage.sync.get('settings', ({ settings }) => {
   const defaultSettings = {
-    suggested: true, promoted: true, followSuggestions: true,
-    jobSuggestions: true, premium: true, games: true,
-    sponsoredMessages: true, viewerSuggestions: true, pageSuggestions: true,
-    master: true
+    suggested: false, promoted: false, followSuggestions: false,
+    jobSuggestions: false, premium: false, games: false,
+    sponsoredMessages: false, viewerSuggestions: false, pageSuggestions: false,
+    master: true, nukeFeed: false
   }
   observeAndRemove(settings ?? defaultSettings)
 })

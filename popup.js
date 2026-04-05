@@ -1,5 +1,6 @@
 const toggles = document.querySelectorAll('[data-key]');
 const master = document.getElementById('masterToggle');
+const nukeFeed = document.getElementById('nukeFeedToggle');
 const resetBtn = document.getElementById('resetBtn');
 
 console.log("[🐛][toggles]: ", toggles)
@@ -60,39 +61,38 @@ const defaultSettings = {
   sponsoredMessages: false,
   viewerSuggestions: false,
   pageSuggestions: false,
-  master: true
+  master: true,
+  nukeFeed: false
 }
 
-
 async function loadSettings() {
-  console.log("[loadSettings]")
-  const { settings } = await chrome.storage.sync.get('settings') || defaultSettings
-  console.log("[🐛][settings]: ", settings)
+  let { settings } = await chrome.storage.sync.get('settings') || defaultSettings
+  settings = settings ?? defaultSettings
   master.checked = settings.master
+  nukeFeed.checked = settings.nukeFeed
   toggles.forEach(t => { t.checked = settings[t.dataset.key] })
+}
+
+async function saveSettings() {
+  const { settings: currentSettings } = await chrome.storage.sync.get('settings')
+  const updated = currentSettings ?? defaultSettings
+
+  toggles.forEach(t => updated[t.dataset.key] = t.checked)
+  updated.master = master.checked
+  updated.nukeFeed = nukeFeed.checked
+
+  await chrome.storage.sync.set({ settings: updated })
 }
 
 async function reset() {
   console.log("[reset]")
   await chrome.storage.sync.set({ settings: defaultSettings })
+  await loadSettings()
 }
 
-toggles.forEach(opt => {
-  opt.addEventListener('change', async () => {
-    console.log("[🐛][onChange][this]: ", this)
-    // generate updated settings obj 
-    const { settings: currentSettings } = await chrome.storage.sync.get('settings')
-    console.log("[🐛][onChange][storeSettings]: ", currentSettings)
-    const updated = currentSettings ?? defaultSettings
-    toggles.forEach(t => updated[t.dataset.key] = t.checked)
-    updated.master = master.checked
-
-    await chrome.storage.sync.set({ settings: updated })
-  })
-})
-
-resetBtn.addEventListener('click', async () => {
-  reset()
-})
+master.addEventListener('change', saveSettings)
+nukeFeed.addEventListener('change', saveSettings)
+toggles.forEach(opt => opt.addEventListener('change', saveSettings))
+resetBtn.addEventListener('click', reset)
 
 loadSettings()
