@@ -45,12 +45,24 @@ const cleanUp = (settings) => {
 
 let observer = null
 
+const debounce = (fn, delay) => {
+  let timer
+  return () => {
+    clearTimeout(timer)
+    timer = setTimeout(fn, delay)
+  }
+}
+
 const observeAndRemove = (settings) => {
   if (observer) observer.disconnect()
 
   cleanUp(settings)
 
-  observer = new MutationObserver(() => cleanUp(settings))
+  // by default runs your callback on every single DOM change. Expensive.
+  // wait 500ms of DOM silence before running
+  const debouncedCleanUp = debounce(() => cleanUp(settings), 500)
+
+  observer = new MutationObserver(debouncedCleanUp)
   observer.observe(document.body, { childList: true, subtree: true })
 }
 
@@ -69,3 +81,4 @@ chrome.storage.sync.get('settings', ({ settings }) => {
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.settings) observeAndRemove(changes.settings.newValue)
 })
+
