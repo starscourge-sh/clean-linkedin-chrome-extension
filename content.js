@@ -1,7 +1,11 @@
 
 const removeSuggestedPosts = () => {
   const feedItems = document.querySelectorAll("[role=listitem]")
-  feedItems.forEach(fi => fi.outerHTML.includes(">Suggested</p>") && fi.remove())
+  feedItems.forEach(fi => {
+    if (fi.outerHTML.includes(">Suggested</p>")) {
+      fi.remove()
+    }
+  })
 }
 
 const removePromotedPosts = () => {
@@ -15,12 +19,20 @@ const removePromotedPosts = () => {
 
 const removeRecommendedAccountsPosts = () => {
   const feedItems = document.querySelectorAll("[role=listitem]")
-  feedItems.forEach(fi => fi.outerHTML.includes(">Recommended for you</p>") && fi.remove())
+  feedItems.forEach(fi => {
+    if (fi.outerHTML.includes(">Recommended for you</p>")) {
+      fi.remove()
+    }
+  })
 }
 
 const removeRecommendedJobsPosts = () => {
   const feedItems = document.querySelectorAll("[role=listitem]")
-  feedItems.forEach(fi => fi.outerHTML.includes(">Jobs recommended for you</p>") && fi.remove())
+  feedItems.forEach(fi => {
+    if (fi.outerHTML.includes(">Jobs recommended for you</p>")) {
+      fi.remove()
+    }
+  })
 }
 
 const cleanUp = (settings) => {
