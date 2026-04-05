@@ -1,0 +1,98 @@
+const toggles = document.querySelectorAll('[data-key]');
+const master = document.getElementById('masterToggle');
+const resetBtn = document.getElementById('resetBtn');
+
+console.log("[🐛][toggles]: ", toggles)
+console.log("[🐛][master]: ", master)
+
+// function loadSettings() {
+// chrome.storage.sync.get(null, (settings) => {
+// if (settings.enabled === false) master.checked = false;
+// toggles.forEach(t => {
+// if (settings[t.dataset.key] === false) t.checked = false;
+// });
+// });
+// }
+
+// function save(key, value) {
+// chrome.storage.sync.set({ [key]: value });
+// }
+
+// master.addEventListener('change', () => {
+// save('enabled', master.checked);
+// chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+// chrome.tabs.sendMessage(tabs[0].id, { type: 'toggle', enabled: master.checked });
+// });
+// });
+
+// toggles.forEach(t => {
+// t.addEventListener('change', () => {
+// save(t.dataset.key, t.checked);
+// chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+// chrome.tabs.sendMessage(tabs[0].id, { type: 'update', key: t.dataset.key, value: t.checked });
+// });
+// });
+// });
+
+// resetBtn.addEventListener('click', () => {
+// master.checked = true;
+// toggles.forEach(t => { t.checked = true; });
+// const defaults = { enabled: true };
+// toggles.forEach(t => { defaults[t.dataset.key] = true; });
+// chrome.storage.sync.set(defaults);
+// });
+
+// Load blocked count from background
+// chrome.runtime.sendMessage({ type: 'getCount' }, (response) => {
+// if (response) document.getElementById('blockedCount').textContent = response.count || 0;
+// });
+
+// loadSettings();
+//
+
+const defaultSettings = {
+  suggested: false,
+  promoted: false,
+  followSuggestions: false,
+  jobSuggestions: false,
+  premium: false,
+  games: false,
+  sponsoredMessages: false,
+  viewerSuggestions: false,
+  pageSuggestions: false,
+  master: true
+}
+
+
+async function loadSettings() {
+  console.log("[loadSettings]")
+  const { settings } = await chrome.storage.sync.get('settings') || defaultSettings
+  console.log("[🐛][settings]: ", settings)
+  master.checked = settings.master
+  toggles.forEach(t => { t.checked = settings[t.dataset.key] })
+}
+
+async function reset() {
+  console.log("[reset]")
+  await chrome.storage.sync.set({ settings: defaultSettings })
+}
+
+toggles.forEach(opt => {
+  opt.addEventListener('change', async () => {
+    console.log("[🐛][onChange][this]: ", this)
+    // generate updated settings obj 
+    const { settings: currentSettings } = await chrome.storage.sync.get('settings')
+    console.log("[🐛][onChange][storeSettings]: ", currentSettings)
+    const updated = currentSettings ?? defaultSettings
+    toggles.forEach(t => updated[t.dataset.key] = t.checked)
+    updated.master = master.checked
+
+    await chrome.storage.sync.set({ settings: updated })
+  })
+})
+
+resetBtn.addEventListener('click', async () => {
+  reset()
+})
+
+loadSettings()
