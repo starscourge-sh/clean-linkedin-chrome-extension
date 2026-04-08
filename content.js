@@ -1,12 +1,5 @@
 
 const removeFeedDistractions = (settings) => {
-  // feedDistractions = {
-  // Promoted: [],
-  // RecommenedPeopleForYou: [],
-  // RecommenedJobsForYou: [],
-  // Suggested: []
-  // }
-
   const feed = document.querySelector('[data-testid="mainFeed"]')
   if (feed) {
     if (settings.master && settings.nukeFeed) {
