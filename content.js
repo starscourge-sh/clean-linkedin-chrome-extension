@@ -68,8 +68,8 @@ const observeAndRemove = (settings) => {
   cleanUp(settings)
 
   // by default runs your callback on every single DOM change. Expensive.
-  // wait 500ms of DOM silence before running
-  const debouncedCleanUp = debounce(() => cleanUp(settings), 500)
+  // wait 250ms of DOM silence before running
+  const debouncedCleanUp = debounce(() => cleanUp(settings), 250)
 
   observer = new MutationObserver(debouncedCleanUp)
   observer.observe(document.body, { childList: true, subtree: true })
