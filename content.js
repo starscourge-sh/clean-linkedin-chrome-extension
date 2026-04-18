@@ -1,3 +1,26 @@
+const isRecommendedForYou = (component) => {
+  const component = fi.outerHTML
+  if (!component) return false
+  return component.includes(">Recommended for you</p>")
+}
+
+const isJobsRecommendedForYou = (component) => {
+  const component = fi.outerHTML
+  if (!component) return false
+  return component.includes(">Jobs recommended for you</p>")
+}
+
+const isPromoted = (component) => {
+  const component = fi.outerHTML
+  if (!component) return false
+  return component.includes(">Promoted</p>") || component.includes(">Promoted by<span")
+}
+
+const isSuggested = (component) => {
+  const component = fi.outerHTML
+  if (!component) return false
+  return component.includes(">Suggested</p>")
+}
 
 const removeFeedDistractions = (settings) => {
   const feed = document.querySelector('[data-testid="mainFeed"]')
@@ -13,36 +36,43 @@ const removeFeedDistractions = (settings) => {
   const feedItems = document.querySelectorAll("[role=listitem]")
 
   feedItems.forEach(fi => {
-    const component = fi.outerHTML
-    if (component.includes(">Jobs recommended for you</p>") && fi.parentElement.parentElement) {
+    if (isJobsRecommendedForYou(fi.parentElement.parentElement)) {
       if (settings.master && settings.jobSuggestions) {
         fi.parentElement.parentElement.style.contentVisibility = 'hidden'
+        return
       } else {
         fi.parentElement.parentElement.style.contentVisibility = 'visible'
+        return
       }
     }
 
-    if (component.includes(">Recommended for you</p>") && fi.parentElement.parentElement) {
+    if (isRecommendedForYou(fi.parentElement.parentElement)) {
       if (settings.master && settings.followSuggestions) {
         fi.parentElement.parentElement.style.contentVisibility = 'hidden'
+        return
       } else {
         fi.parentElement.parentElement.style.contentVisibility = 'visible'
+        return
       }
     }
 
-    if ((component.includes(">Promoted</p>") || component.includes(">Promoted by<span")) && fi.parentElement.parentElement) {
+    if (isPromoted(fi.parentElement.parentElement)) {
       if (settings.master && settings.promoted) {
         fi.parentElement.parentElement.style.contentVisibility = 'hidden'
+        return
       } else {
         fi.parentElement.parentElement.style.contentVisibility = 'visible'
+        return
       }
     }
 
-    if (component.includes(">Suggested</p>") && fi.parentElement.parentElement) {
+    if (isSuggested(fi.parentElement.parentElement)) {
       if (settings.master && settings.suggested) {
         fi.parentElement.parentElement.style.contentVisibility = 'hidden'
+        return
       } else {
         fi.parentElement.parentElement.style.contentVisibility = 'visible'
+        return
       }
     }
   })
@@ -68,8 +98,8 @@ const observeAndRemove = (settings) => {
   cleanUp(settings)
 
   // by default runs your callback on every single DOM change. Expensive.
-  // wait 250ms of DOM silence before running
-  const debouncedCleanUp = debounce(() => cleanUp(settings), 10)
+  // wait 50ms of DOM silence before running
+  const debouncedCleanUp = debounce(() => cleanUp(settings), 50)
 
   observer = new MutationObserver(debouncedCleanUp)
   observer.observe(document.body, { childList: true, subtree: true })
@@ -81,7 +111,7 @@ chrome.storage.sync.get('settings', ({ settings }) => {
     suggested: false, promoted: false, followSuggestions: false,
     jobSuggestions: false, premium: false, games: false,
     sponsoredMessages: false, viewerSuggestions: false, pageSuggestions: false,
-    master: true, nukeFeed: false
+    master: true, nukeFeed: false, phrases: ''
   }
   observeAndRemove(settings ?? defaultSettings)
 })

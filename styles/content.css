@@ -160,6 +160,18 @@
     transform: translateX(14px);
     background: var(--floral-white);
   }
+
+  .keyword-filter-input {
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 11px;
+    color: var(--dust-grey);
+    background: var(--charcoal-brown);
+    border: none;
+    border-radius: 4px;
+    margin-top: 8px;
+    min-height: 100px;
+  }
  
   .divider {
     height: 1px;
