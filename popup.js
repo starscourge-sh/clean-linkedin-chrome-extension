@@ -1,6 +1,7 @@
 const toggles = document.querySelectorAll('[data-key]');
 const master = document.getElementById('masterToggle');
-const phrases = document.getElementById('keywordFilter');
+const phrases = document.getElementById('filterPhrases');
+const phrasesInput = document.getElementById('keywordFilter');
 const nukeFeed = document.getElementById('nukeFeedToggle');
 const resetBtn = document.getElementById('resetBtn');
 
@@ -24,7 +25,7 @@ async function loadSettings() {
   settings = settings ?? defaultSettings
   master.checked = settings.master
   nukeFeed.checked = settings.nukeFeed
-  phrases.value = settings.phrases ?? ""
+  phrasesInput.value = settings.phrases ?? ""
   toggles.forEach(t => { t.checked = settings[t.dataset.key] })
 }
 
@@ -35,7 +36,8 @@ async function saveSettings() {
   toggles.forEach(t => updated[t.dataset.key] = t.checked)
   updated.master = master.checked
   updated.nukeFeed = nukeFeed.checked
-  updated.phrases = phrases.value
+  updated.phrases = phrasesInput.value
+  // updated.phrasesFilter = phrasesInput.value
 
   await chrome.storage.sync.set({ settings: updated })
 }
@@ -47,10 +49,9 @@ async function reset() {
 }
 
 master.addEventListener('change', saveSettings)
+phrases.addEventListener('change', saveSettings)
 nukeFeed.addEventListener('change', saveSettings)
 toggles.forEach(opt => opt.addEventListener('change', saveSettings))
 resetBtn.addEventListener('click', reset)
-phrases.addEventListener('input', saveSettings)
-phrases.addEventListener('change', saveSettings)
 
 loadSettings()

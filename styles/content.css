@@ -90,6 +90,7 @@
  
   .option {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     padding: 8px;
@@ -163,6 +164,7 @@
 
   .keyword-filter-input {
     width: 100%;
+    display: block;
     padding: 6px 12px;
     font-size: 11px;
     color: var(--dust-grey);

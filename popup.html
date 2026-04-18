@@ -57,12 +57,19 @@
     </label>
 
     <label class="option">
-      <div>
-        <div class="option-info">
-          <div class="option-name">Keyword filter</div>
-          <div class="option-desc">Filter out posts by keywords/phrases. Add a CSV list of phrases to look for.</div>
+      <div class="option-info">
+        <div class="option-name">Keyword filter</div>
+        <div class="option-desc">Filter out posts by keywords/phrases. Add a CSV list of phrases to look for.</div>
+      </div>
+
+      <div style"width:100%">
+        <div class="toggle">
+          <div class="toggle"><input type="checkbox" id="filterPhrases" checked>
+            <div class="slider"></div>
+          </div>
         </div>
-        <div class="keyword-filter">
+
+        <div class="keyword-filter" style="flex:1; width:100%">
           <textarea class="keyword-filter-input" type="text" id="keywordFilter"
             placeholder="Enter keywords, separated by commas"></textarea>
         </div>
