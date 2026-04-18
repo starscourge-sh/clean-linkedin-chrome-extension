@@ -22,60 +22,69 @@ const isSuggested = (component) => {
   return component.includes(">Suggested</p>")
 }
 
+const containsFilteredPhrase = (component, phrases) => {
+  try {
+    const component = fi.outerHTML
+    const phrasesArray = phrases.split(',').map(p => p.trim()).filter(p => p.length > 0)
+    return phrasesArray.some(phrase => component.includes(phrase))
+  } catch (e) {
+    console.error("Error checking phrases:", e)
+    return false
+  }
+}
+
+
 const removeFeedDistractions = (settings) => {
   const feed = document.querySelector('[data-testid="mainFeed"]')
-  if (feed) {
-    if (settings.master && settings.nukeFeed) {
-      feed.style.contentVisibility = 'hidden'
-      return
-    } else {
-      feed.style.contentVisibility = 'visible'
+  try {
+    if (feed) {
+      if (settings.master && settings.nukeFeed) {
+        feed.style.contentVisibility = 'hidden'
+      } else {
+        feed.style.contentVisibility = 'visible'
+      }
     }
+
+    const feedItems = document.querySelectorAll("[role=listitem]")
+
+    feedItems.forEach(fi => {
+      if (isJobsRecommendedForYou(fi.parentElement.parentElement)) {
+        if (settings.master && (settings.jobSuggestions || containsFilteredPhrase(fi.parentElement.parentElement, settings.phrases))) {
+          fi.parentElement.parentElement.style.contentVisibility = 'hidden'
+        } else {
+          fi.parentElement.parentElement.style.contentVisibility = 'visible'
+        }
+      }
+
+      if (isRecommendedForYou(fi.parentElement.parentElement)) {
+        if (settings.master && (settings.followSuggestions || containsFilteredPhrase(fi.parentElement.parentElement, settings.phrases))) {
+          fi.parentElement.parentElement.style.contentVisibility = 'hidden'
+        } else {
+          fi.parentElement.parentElement.style.contentVisibility = 'visible'
+        }
+      }
+
+      if (isPromoted(fi.parentElement.parentElement)) {
+        if (settings.master && (settings.promoted || containsFilteredPhrase(fi.parentElement.parentElement, settings.phrases))) {
+          fi.parentElement.parentElement.style.contentVisibility = 'hidden'
+        } else {
+          fi.parentElement.parentElement.style.contentVisibility = 'visible'
+        }
+      }
+
+      if (isSuggested(fi.parentElement.parentElement)) {
+        if (settings.master && (settings.suggested || containsFilteredPhrase(fi.parentElement.parentElement, settings.phrases))) {
+          fi.parentElement.parentElement.style.contentVisibility = 'hidden'
+        } else {
+          fi.parentElement.parentElement.style.contentVisibility = 'visible'
+        }
+      }
+
+    })
+  } catch (e) {
+    console.error("Error in removeFeedDistractions:", e)
+    return
   }
-
-  const feedItems = document.querySelectorAll("[role=listitem]")
-
-  feedItems.forEach(fi => {
-    if (isJobsRecommendedForYou(fi.parentElement.parentElement)) {
-      if (settings.master && settings.jobSuggestions) {
-        fi.parentElement.parentElement.style.contentVisibility = 'hidden'
-        return
-      } else {
-        fi.parentElement.parentElement.style.contentVisibility = 'visible'
-        return
-      }
-    }
-
-    if (isRecommendedForYou(fi.parentElement.parentElement)) {
-      if (settings.master && settings.followSuggestions) {
-        fi.parentElement.parentElement.style.contentVisibility = 'hidden'
-        return
-      } else {
-        fi.parentElement.parentElement.style.contentVisibility = 'visible'
-        return
-      }
-    }
-
-    if (isPromoted(fi.parentElement.parentElement)) {
-      if (settings.master && settings.promoted) {
-        fi.parentElement.parentElement.style.contentVisibility = 'hidden'
-        return
-      } else {
-        fi.parentElement.parentElement.style.contentVisibility = 'visible'
-        return
-      }
-    }
-
-    if (isSuggested(fi.parentElement.parentElement)) {
-      if (settings.master && settings.suggested) {
-        fi.parentElement.parentElement.style.contentVisibility = 'hidden'
-        return
-      } else {
-        fi.parentElement.parentElement.style.contentVisibility = 'visible'
-        return
-      }
-    }
-  })
 }
 
 const cleanUp = (settings) => {

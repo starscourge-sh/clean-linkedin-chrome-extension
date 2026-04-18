@@ -24,7 +24,7 @@ async function loadSettings() {
   settings = settings ?? defaultSettings
   master.checked = settings.master
   nukeFeed.checked = settings.nukeFeed
-  phrases.value = settings.phrases
+  phrases.value = settings.phrases ?? ""
   toggles.forEach(t => { t.checked = settings[t.dataset.key] })
 }
 
@@ -50,7 +50,7 @@ master.addEventListener('change', saveSettings)
 nukeFeed.addEventListener('change', saveSettings)
 toggles.forEach(opt => opt.addEventListener('change', saveSettings))
 resetBtn.addEventListener('click', reset)
-// phrases.addEventListener('input', saveSettings)
+phrases.addEventListener('input', saveSettings)
 phrases.addEventListener('change', saveSettings)
 
 loadSettings()
